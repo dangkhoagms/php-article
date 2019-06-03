@@ -11,6 +11,7 @@
                 <th>Id</th>
                 <th>Name</th>
                 <th>Author_Name</th>
+                <th>Category_Name</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -20,6 +21,12 @@
                 <td>{{ article.id }}</td>
                 <td>{{ article.name }}</td>
                 <td>{{ article.getAuthor().name }}</td>
+
+                <td>
+                    {% for item in article.getCategory() %}
+                    {{ item }},
+                    {% endfor %}
+                </td>
                 <td>
                     <a href="{{ path('article_show', {'id': article.id}) }}">show</a>
                     <a href="{{ path('article_edit', {'id': article.id}) }}">edit</a>
