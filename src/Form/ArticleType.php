@@ -24,9 +24,9 @@ class ArticleType extends AbstractType
         ->add('author', EntityType::class, [
             'class' => Author::class,
         ])
-        ->add('categories',CollectionType::class,[
-            'entry_type' =>Category::class,
-
+        ->add('categories',EntityType::class,[
+            'class' => Category::class,
+            'multiple'=>true
             ])
         ;
     }

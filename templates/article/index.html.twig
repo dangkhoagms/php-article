@@ -23,7 +23,7 @@
                 <td>{{ article.getAuthor().name }}</td>
 
                 <td>
-                    {% for item in article.getCategory() %}
+                    {% for item in article.getCategories() %}
                     {{ item }},
                     {% endfor %}
                 </td>
