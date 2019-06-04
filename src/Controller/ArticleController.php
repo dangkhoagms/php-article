@@ -4,13 +4,20 @@ namespace App\Controller;
 
 use App\Entity\Article;
 use App\Entity\Author;
+use App\Entity\Category;
 use App\Form\ArticleType;
 use App\Repository\ArticleRepository;
 use App\Repository\AuthorRepository;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Encoder\JsonEncode;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @Route("/article")
@@ -53,10 +60,35 @@ class ArticleController extends AbstractController
     }
 
     /**
+     * @Route("/view",name="article_json")
+     */
+    public function viewAll(ArticleRepository $articleRepository)
+    {
+        $json = $articleRepository->findAll();
+//        $arr = [];
+//        for ($i = 1; $i < 8; $i++) {
+//            $arr[$i] = $json[$i];
+//            $arr[$i]->setAuthor(null);
+//        }
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+        $encoders = [new JsonEncoder()];
+        $normal = [new ObjectNormalizer()];
+        $serializer = new Serializer($normal, $encoders);
+
+        //$jsonContent = $serializer->serialize($arr, 'json');
+        $jsonContent = $serializer->serialize($json, 'json');
+        $response->setContent($jsonContent);
+
+        return $response;
+    }
+
+    /**
      * @Route("/{id}", name="article_show", methods={"GET"})
      */
     public function show(Article $article): Response
     {
+        dump($article, $this);
         return $this->render('article/show.html.twig', [
             'article' => $article,
         ]);
@@ -84,12 +116,13 @@ class ArticleController extends AbstractController
         ]);
     }
 
+
     /**
      * @Route("/{id}", name="article_delete", methods={"DELETE"})
      */
     public function delete(Request $request, Article $article): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$article->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $article->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($article);
             $entityManager->flush();
@@ -97,4 +130,5 @@ class ArticleController extends AbstractController
 
         return $this->redirectToRoute('article_index');
     }
+
 }
